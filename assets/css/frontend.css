@@ -1,0 +1,17 @@
+body {
+	
+    background: #fff;
+}
+
+.btn {
+	
+	border-radius: 0px;
+}
+
+@media (min-width: 992px){
+	
+	.modal-lg {
+		
+		width: 1000px !important;
+	}	
+}
