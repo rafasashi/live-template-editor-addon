@@ -127,11 +127,9 @@ class LTPLE_Addon {
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), 10, 1 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_styles' ), 10, 1 );
 	
-		$this->request  = new LTPLE_Addon_Request();
+		$this->request  = new LTPLE_Addon_Request( $this );
 
 		$this->admin 	= new LTPLE_Addon_Admin_API( $this );
-		
-		$this->domain 	= new LTPLE_Addon_Domain( $this );
 		
 		if ( !is_admin() ) {
 

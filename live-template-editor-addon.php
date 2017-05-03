@@ -9,7 +9,7 @@
  * Requires at least: 4.6
  * Tested up to: 4.7
  *
- * Text Domain: ltple-addon
+ * Text Domain: ltple
  * Domain Path: /lang/
  *
  * @package WordPress
@@ -65,9 +65,9 @@
 	
 	// Load plugin class files
 
-	require_once( 'includes'.$mode.'/class-ltple-addon.php' );
-	require_once( 'includes'.$mode.'/class-ltple-addon-settings.php' );
-	require_once( 'includes'.$mode.'/class-ltple-addon-object.php' );
+	require_once( 'includes'.$mode.'/class-ltple.php' );
+	require_once( 'includes'.$mode.'/class-ltple-settings.php' );
+	require_once( 'includes'.$mode.'/class-ltple-object.php' );
 
 	// Autoload plugin libraries
 	

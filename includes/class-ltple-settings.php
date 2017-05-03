@@ -89,16 +89,7 @@ class LTPLE_Addon_Settings {
 		
 		//add menu in wordpress dashboard
 		
-		add_menu_page('Live Editor Addon', 'Live Editor Addon', 'manage_options', $this->plugin->slug, array($this, 'settings_page'),'dashicons-layout');
-	
-		add_submenu_page(
-		
-			$this->plugin->slug,
-			__( 'Domains', $this->plugin->slug ),
-			__( 'Domains', $this->plugin->slug ),
-			'edit_pages',
-			'edit.php?post_type=domain'
-		);
+		//add_menu_page('Addon', 'Addon', 'manage_options', $this->plugin->slug, array($this, 'settings_page'),'dashicons-layout');
 	}
 
 	/**
