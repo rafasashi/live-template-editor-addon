@@ -87,7 +87,6 @@
 
 		require_once( 'includes'.$mode.'/class-ltple.php' );
 		require_once( 'includes'.$mode.'/class-ltple-settings.php' );
-		require_once( 'includes'.$mode.'/class-ltple-object.php' );
 
 		// Autoload plugin libraries
 		
