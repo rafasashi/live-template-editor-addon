@@ -80,10 +80,6 @@ class LTPLE_Addon {
 	 */
 	public $script_suffix;
 	
-	public $host;
-	public $ref;
-	
-	public $user;
 
 	/**
 	 * Constructor function.
@@ -91,31 +87,11 @@ class LTPLE_Addon {
 	 * @since   1.0.0
 	 * @return  void
 	 */
-	public function __construct ( $file = '', $version = '1.0.0' ) {
+	public function __construct ( $parent, $version = '1.0.0' ) {
 		
 		$this->_version = $version;
-		$this->_token 	= 'ltple';
-		$this->_base 	= 'ltple_';
 		
-		if( isset($_GET['_']) && is_numeric($_GET['_']) ){
-			
-			$this->_time = intval($_GET['_']);
-		}
-		else{
-			
-			$this->_time = time();
-		}
-		
-		// Load plugin environment variables
-		$this->file 		= $file;
-		$this->dir 			= dirname( $this->file );
-		$this->views		= trailingslashit( $this->dir ) . 'views';
-		$this->vendor  		= WP_CONTENT_DIR . '/vendor';
-		$this->assets_dir 	= trailingslashit( $this->dir ) . 'assets';
-		$this->assets_url 	= esc_url( trailingslashit( plugins_url( '/assets/', $this->file ) ) );
-	
-		//$this->script_suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-		$this->script_suffix = '';
+		$this->parent = $parent;
 
 		register_activation_hook( $this->file, array( $this, 'install' ) );		
 
@@ -126,114 +102,32 @@ class LTPLE_Addon {
 		// Load admin JS & CSS
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), 10, 1 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_styles' ), 10, 1 );
-	
-		$this->request  = new LTPLE_Addon_Request( $this );
-
-		$this->admin 	= new LTPLE_Addon_Admin_API( $this );
 		
+		$this->settings = new LTPLE_Addon_Settings( $this->parent );
+		
+		$this->admin = new LTPLE_Addon_Admin_API( $this );
+
 		if ( !is_admin() ) {
 
 			// Load API for generic admin functions
 			
 			add_action( 'wp_head', array( $this, 'addon_header') );
 			add_action( 'wp_footer', array( $this, 'addon_footer') );
-			
-			if( WP_SITEURL == $this->host->url ){
-				
-				// get plan
-				
-				$this->plan = new LTPLE_Addon_Plan( $this );
-			}
-			else{
-				
-				// get layer content
-				
-				$url = parse_url(urldecode(urldecode($_SERVER['SCRIPT_URI'])));
-				
-				if( !empty($url['host']) ){
-					
-					$domain = explode('.',$url['host'],2);
-					
-					$domain = ( ( !empty($domain[1]) ) ? $domain[1] : $domain[0]);
-
-					$domain = get_page_by_title($domain, OBJECT, 'domain');
-					
-					if( !empty($domain) ){
-					
-						$domainClientUrl = get_post_meta( $domain->ID, 'domainClientUrl', true);
-					
-						if( !empty($domainClientUrl) ){
-							
-							$resourceUrl = $domainClientUrl . '/?api=layer/show&url='.urlencode($_SERVER['SCRIPT_URI']);
-
-							$ch = curl_init($resourceUrl);
-							
-							curl_setopt($ch, CURLOPT_VERBOSE, 1);
-						
-							// Turn off the server and peer verification (TrustManager Concept).
-							curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-							curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-						
-							curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-							curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		
-							curl_setopt($ch, CURLOPT_USERAGENT,'Mozilla/5.0 (compatible; Recuweb/1.0; +http://host.recuweb.com/)');
-							
-							$result = curl_exec($ch);
-							
-							$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-							
-							curl_close($ch);				
-
-							if( $httpcode < 400 && !empty($result) ){
-								
-								// output layer content
-
-								echo $result;
-								exit;
-							}
-						}
-					}
-				}
-			}
 		}
 		
 		// Handle localisation
+		
 		$this->load_plugin_textdomain();
+		
 		add_action( 'init', array( $this, 'load_localisation' ), 0 );
 		
 		//init profiler 
 		
 		add_action( 'init', array( $this, 'addon_init' ));	
-		
-		//remove admin bar in frontend
-		
-		add_action('after_setup_theme', function () {
-			
-			//if (!$this->user->is_admin && !is_admin()) {
-			
-				show_admin_bar(false);
-			//}
-		});
 
 		// Custom editor template
 		
-		add_filter( 'template_include', array( $this, 'addon_template'), 1 );
-		
-		// Custom default email address
-		
-		add_filter('wp_mail_from', function($old){
-			
-			$urlparts = parse_url(site_url());
-			$domain = $urlparts ['host'];
-			
-			return 'noreply@'.$domain;
-		});
-		
-		add_filter('wp_mail_from_name', function($old) {
-			
-			return 'Live Editor Addon';
-		});		
+		add_filter( 'template_include', array( $this, 'addon_template'), 1 );	
 		
 	} // End __construct ()
 	
@@ -243,106 +137,9 @@ class LTPLE_Addon {
 		return $template_path;
 	}
 	
-	private function ltple_get_secret_iv(){
-		
-		//$secret_iv = md5( $this->user_agent . $this->user_ip );
-		//$secret_iv = md5( $this->user_ip );
-		$secret_iv = md5( 'another-secret' );	
-
-		return $secret_iv;
-	}	
-	
-	private function ltple_encrypt_str($string){
-		
-		$output = false;
-
-		$encrypt_method = "AES-256-CBC";
-		
-		$secret_key = md5( $this->host->key );
-		
-		$secret_iv = $this->ltple_get_secret_iv();
-		
-		// hash
-		$key = hash('sha256', $secret_key);
-		
-		// iv - encrypt method AES-256-CBC expects 16 bytes - else you will get a warning
-		$iv = substr(hash('sha256', $secret_iv), 0, 16);
-
-		$output = openssl_encrypt($string, $encrypt_method, $key, 0, $iv);
-		$output = $this->base64_urlencode($output);
-
-		return $output;
-	}
-	
-	private function ltple_decrypt_str($string){
-		
-		$output = false;
-
-		$encrypt_method = "AES-256-CBC";
-		
-		$secret_key = md5( $this->host->key );
-		
-		$secret_iv = $this->ltple_get_secret_iv();
-
-		// hash
-		$key = hash( 'sha256', $secret_key);
-		
-		// iv - encrypt method AES-256-CBC expects 16 bytes - else you will get a warning
-		$iv = substr( hash( 'sha256', $secret_iv ), 0, 16);
-
-		$output = openssl_decrypt($this->base64_urldecode($string), $encrypt_method, $key, 0, $iv);
-
-		return $output;
-	}
-	
-	private function ltple_encrypt_uri($uri,$len=250,$separator='/'){
-		
-		$uri = wordwrap($this->ltple_encrypt_str($uri),$len,$separator,true);
-		
-		return $uri;
-	}
-	
-	private function ltple_decrypt_uri($uri,$separator='/'){
-		
-		$uri = $this->ltple_decrypt_str(str_replace($separator,'',$uri));
-		
-		return $uri;
-	}
-	
-	public function base64_urlencode($inputStr=''){
-
-		return strtr(base64_encode($inputStr), '+/=', '-_,');
-	}
-
-	public function base64_urldecode($inputStr=''){
-
-		return base64_decode(strtr($inputStr, '-_,', '+/='));
-	}
-	
 	public function addon_init(){	
-
-		//get current user
 		
-		if( $this->request->is_remote ){
-			
-			$this->user = wp_set_current_user( get_user_by( 'email', $this->ltple_decrypt_str($_SERVER['HTTP_X_FORWARDED_USER'])));
-		}
-		else{
-			
-			$this->user = wp_get_current_user();
-		}
 		
-		//get user loggedin
-
-		$this->user->loggedin = is_user_logged_in();
-
-		// get is admin
-		
-		$this->user->is_admin = current_user_can( 'administrator', $this->user->ID );
-		
-		// set edited User
-		
-		$this->editedUser = $this->user;
 	}
 	
 	public function addon_header(){
@@ -367,7 +164,7 @@ class LTPLE_Addon {
 
 		if ( ! $post_type || ! $plural || ! $single ) return;
 
-		$post_type = new LTPLE_Addon_Post_Type( $post_type, $plural, $single, $description, $options );
+		$post_type = new LTPLE_Client_Post_Type( $post_type, $plural, $single, $description, $options );
 
 		return $post_type;
 	}
@@ -384,7 +181,7 @@ class LTPLE_Addon {
 
 		if ( ! $taxonomy || ! $plural || ! $single ) return;
 
-		$taxonomy = new LTPLE_Addon_Taxonomy( $taxonomy, $plural, $single, $post_types, $taxonomy_args );
+		$taxonomy = new LTPLE_Client_Taxonomy( $taxonomy, $plural, $single, $post_types, $taxonomy_args );
 
 		return $taxonomy;
 	}
@@ -396,6 +193,7 @@ class LTPLE_Addon {
 	 * @return void
 	 */
 	public function enqueue_styles () {
+		
 		wp_register_style( $this->_token . '-frontend', esc_url( $this->assets_url ) . 'css/frontend.css', array(), $this->_version );
 		wp_enqueue_style( $this->_token . '-frontend' );
 	} // End enqueue_styles ()
@@ -407,6 +205,7 @@ class LTPLE_Addon {
 	 * @return  void
 	 */
 	public function enqueue_scripts () {
+		
 		wp_register_script( $this->_token . '-frontend', esc_url( $this->assets_url ) . 'js/frontend' . $this->script_suffix . '.js', array( 'jquery' ), $this->_version );
 		wp_enqueue_script( $this->_token . '-frontend' );
 	} // End enqueue_scripts ()
@@ -418,6 +217,7 @@ class LTPLE_Addon {
 	 * @return  void
 	 */
 	public function admin_enqueue_styles ( $hook = '' ) {
+		
 		wp_register_style( $this->_token . '-admin', esc_url( $this->assets_url ) . 'css/admin.css', array(), $this->_version );
 		wp_enqueue_style( $this->_token . '-admin' );
 	} // End admin_enqueue_styles ()
@@ -429,6 +229,7 @@ class LTPLE_Addon {
 	 * @return  void
 	 */
 	public function admin_enqueue_scripts ( $hook = '' ) {
+		
 		wp_register_script( $this->_token . '-admin', esc_url( $this->assets_url ) . 'js/admin' . $this->script_suffix . '.js', array( 'jquery' ), $this->_version );
 		wp_enqueue_script( $this->_token . '-admin' );
 	} // End admin_enqueue_scripts ()
@@ -440,7 +241,8 @@ class LTPLE_Addon {
 	 * @return  void
 	 */
 	public function load_localisation () {
-		load_plugin_textdomain( 'live-template-editor-addon', false, dirname( plugin_basename( $this->file ) ) . '/lang/' );
+		
+		load_plugin_textdomain( $this->settings->plugin->slug, false, dirname( plugin_basename( $this->file ) ) . '/lang/' );
 	} // End load_localisation ()
 
 	/**
@@ -450,7 +252,8 @@ class LTPLE_Addon {
 	 * @return  void
 	 */
 	public function load_plugin_textdomain () {
-	    $domain = 'live-template-editor-addon';
+		
+	    $domain = $this->settings->plugin->slug;
 
 	    $locale = apply_filters( 'plugin_locale', get_locale(), $domain );
 

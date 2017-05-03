@@ -51,61 +51,60 @@
 		}
 	}
 	
-	add_filter('plugin_row_meta', 'ltple_row_meta', 10, 2);
-	
-	$mode = ( is_dev_env() ? '-dev' : '');
-	
-	if( $mode == '-dev' ){
-		
-		ini_set('display_errors', 1);
-	}
-
-	// Load plugin functions
-	require_once( 'includes'.$mode.'/functions.php' );	
-	
-	// Load plugin class files
-
-	require_once( 'includes'.$mode.'/class-ltple.php' );
-	require_once( 'includes'.$mode.'/class-ltple-settings.php' );
-	require_once( 'includes'.$mode.'/class-ltple-object.php' );
-
-	// Autoload plugin libraries
-	
-	$lib = glob( __DIR__ . '/includes'.$mode.'/lib/class-ltple-*.php');
-	
-	foreach($lib as $file){
-		
-		require_once( $file );
-	}
-
 	/**
 	 * Returns the main instance of LTPLE_Addon to prevent the need to use globals.
 	 *
 	 * @since  1.0.0
 	 * @return object LTPLE_Addon
 	 */
-	function LTPLE_Addon () {
+	function LTPLE_Addon ( $version = '1.0.0' ) {
 		
-		$instance = LTPLE_Addon::instance( __FILE__, '1.0.0' );
-
-		if ( is_null( $instance->_dev ) ) {
-			
-			$instance->_dev = ( is_dev_env() ? '-dev' : '');
-		}		
+		$instance = LTPLE_Client::instance( __FILE__, $version );
 		
-		if ( is_null( $instance->settings ) ) {
-			
-			$instance->settings = LTPLE_Addon_Settings::instance( $instance );
+		if ( is_null( $instance->addon ) ) {
+		
+			$instance = LTPLE_Addon::instance( $instance, $version );
 		}
 
 		return $instance;
-	}
+	}	
 	
-	if( $mode == '-dev' ){
+	add_filter('plugin_row_meta', 'ltple_row_meta', 10, 2);
+	
+	add_filter( 'plugins_loaded', function(){
+
+		$mode = ( is_dev_env() ? '-dev' : '');
 		
-		LTPLE_Addon('1.1.1');
-	}
-	else{
+		if( $mode == '-dev' ){
+			
+			ini_set('display_errors', 1);
+		}
+
+		// Load plugin functions
+		require_once( 'includes'.$mode.'/functions.php' );	
 		
-		LTPLE_Addon('1.1.0');
-	}
+		// Load plugin class files
+
+		require_once( 'includes'.$mode.'/class-ltple.php' );
+		require_once( 'includes'.$mode.'/class-ltple-settings.php' );
+		require_once( 'includes'.$mode.'/class-ltple-object.php' );
+
+		// Autoload plugin libraries
+		
+		$lib = glob( __DIR__ . '/includes'.$mode.'/lib/class-ltple-*.php');
+		
+		foreach($lib as $file){
+			
+			require_once( $file );
+		}
+	
+		if( $mode == '-dev' ){
+			
+			LTPLE_Addon('1.1.1');
+		}
+		else{
+			
+			LTPLE_Addon('1.1.0');
+		}		
+	});
+	
