@@ -12,89 +12,34 @@ class LTPLE_Addon {
 	 */
 	private static $_instance = null;
 
-	public $_dev = null;
-	
-	/**
-	 * Settings class object
-	 * @var     object
-	 * @access  public
-	 * @since   1.0.0
-	 */
-	public $settings = null;
-
-	/**
-	 * The version number.
-	 * @var     string
-	 * @access  public
-	 * @since   1.0.0
-	 */
-	public $_version;
-
-	/**
-	 * The token.
-	 * @var     string
-	 * @access  public
-	 * @since   1.0.0
-	 */
-	public $_token;
-	
-	public $_time;
-
-	/**
-	 * The main plugin file.
-	 * @var     string
-	 * @access  public
-	 * @since   1.0.0
-	 */
-	public $file;
-
-	/**
-	 * The main plugin directory.
-	 * @var     string
-	 * @access  public
-	 * @since   1.0.0
-	 */
-	public $dir;
-
-	/**
-	 * The plugin assets directory.
-	 * @var     string
-	 * @access  public
-	 * @since   1.0.0
-	 */
-	public $assets_dir;
-
-	/**
-	 * The plugin assets URL.
-	 * @var     string
-	 * @access  public
-	 * @since   1.0.0
-	 */
-	public $assets_url;
-
-	/**
-	 * Suffix for Javascripts.
-	 * @var     string
-	 * @access  public
-	 * @since   1.0.0
-	 */
-	public $script_suffix;
-	
-
 	/**
 	 * Constructor function.
 	 * @access  public
 	 * @since   1.0.0
 	 * @return  void
 	 */
-	public function __construct ( $parent, $version = '1.0.0' ) {
-		
-		$this->_version = $version;
-		
+	public function __construct ( $file='', $parent, $version = '1.0.0' ) {
+
 		$this->parent = $parent;
+	
+		$this->_version = $version;
+		$this->_token	= md5($file);
+		
+		$this->message = '';
+		
+		// Load plugin environment variables
+		$this->file 		= $file;
+		$this->dir 			= dirname( $this->file );
+		$this->views   		= trailingslashit( $this->dir ) . 'views';
+		$this->vendor  		= WP_CONTENT_DIR . '/vendor';
+		$this->assets_dir 	= trailingslashit( $this->dir ) . 'assets';
+		$this->assets_url 	= esc_url( trailingslashit( plugins_url( '/assets/', $this->file ) ) );
+		
+		//$this->script_suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$this->script_suffix = '';
 
-		register_activation_hook( $this->file, array( $this, 'install' ) );		
-
+		register_activation_hook( $this->file, array( $this, 'install' ) );
+		
 		// Load frontend JS & CSS
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ), 10 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), 10 );

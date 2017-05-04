@@ -62,8 +62,10 @@
 		$instance = LTPLE_Client::instance( __FILE__, $version );
 		
 		if ( is_null( $instance->addon ) ) {
-		
-			$instance = LTPLE_Addon::instance( $instance, $version );
+			
+			$instance->addon = new stdClass();
+			
+			$instance->addon = LTPLE_Addon::instance( __FILE__, $instance, $version );
 		}
 
 		return $instance;
