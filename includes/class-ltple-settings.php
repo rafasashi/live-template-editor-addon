@@ -43,9 +43,25 @@ class LTPLE_Addon_Settings {
 		$this->plugin 		 	= new stdClass();
 		$this->plugin->slug  	= 'live-template-editor-addon';
 		
-		add_action('ltple_addon_settings', array($this, 'settings_fields' ) );
+		add_action('ltple_plugin_settings', array($this, 'plugin_info' ) );
+		
+		add_action('ltple_plugin_settings', array($this, 'settings_fields' ) );
 		
 		add_action( 'ltple_admin_menu' , array( $this, 'add_menu_items' ) );	
+	}
+	
+	public function plugin_info(){
+		
+		$this->parent->settings->addons['addon-plugin'] = array(
+			
+			'title' 		=> 'Addon Plugin',
+			'addon_link' 	=> 'https://github.com/rafasashi/live-template-editor-addon',
+			'addon_name' 	=> 'live-template-editor-addon',
+			'source_url' 	=> 'https://github.com/rafasashi/live-template-editor-addon/archive/master.zip',
+			'description'	=> 'This is a first test of addon plugin for live template editor.',
+			'author' 		=> 'Rafasashi',
+			'author_link' 	=> 'https://profiles.wordpress.org/rafasashi/',
+		);		
 	}
 
 	/**
@@ -55,8 +71,7 @@ class LTPLE_Addon_Settings {
 	public function settings_fields () {
 		
 		$settings = [];
-		
-		/*
+
 		$settings['test'] = array(
 			'title'					=> __( 'Test', $this->plugin->slug ),
 			'description'			=> '',
@@ -72,7 +87,6 @@ class LTPLE_Addon_Settings {
 				),				
 			)
 		);
-		*/
 		
 		if( !empty($settings) ){
 		
@@ -99,21 +113,13 @@ class LTPLE_Addon_Settings {
 	public function add_menu_items () {
 		
 		//add menu in wordpress dashboard
-		/*
-		add_users_page( 
-			'Test', 
-			'Test', 
-			'edit_pages',
-			'users.php?' . $this->parent->_base .'view=test'
-		);
-		
+
 		add_submenu_page(
 			'live-template-editor-client',
-			__( 'Test', $this->plugin->slug ),
-			__( 'Test', $this->plugin->slug ),
+			__( 'Addon test', $this->plugin->slug ),
+			__( 'Addon test', $this->plugin->slug ),
 			'edit_pages',
-			'edit.php?post_type=affiliate-commission'
+			'edit.php?post_type=post'
 		);
-		*/
 	}
 }
