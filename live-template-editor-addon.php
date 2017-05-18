@@ -24,33 +24,6 @@
 	
 	if ( ! defined( 'ABSPATH' ) ) exit;
 	
-	if(!function_exists('is_dev_env')){
-		
-		function is_dev_env( $dev_ip = '176.132.10.223' ){
-			
-			if( $_SERVER['REMOTE_ADDR'] == $dev_ip || ( isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] == $dev_ip ) ){
-				
-				return true;
-			}
-
-			return false;		
-		}
-	}
-	
-	if(!function_exists('ltple_row_meta')){
-	
-		function ltple_row_meta( $links, $file ){
-			
-			if ( strpos( $file, basename( __FILE__ ) ) !== false ) {
-				
-				$new_links = array( '<a href="https://github.com/rafasashi" target="_blank">' . __( 'Documentation', 'cleanlogin' ) . '</a>' );
-				$links = array_merge( $links, $new_links );
-			}
-			
-			return $links;
-		}
-	}
-	
 	/**
 	 * Returns the main instance of LTPLE_Addon to prevent the need to use globals.
 	 *
@@ -71,11 +44,11 @@
 		return $instance;
 	}	
 	
-	add_filter('plugin_row_meta', 'ltple_row_meta', 10, 2);
-	
 	add_filter( 'plugins_loaded', function(){
 
-		$mode = ( is_dev_env() ? '-dev' : '');
+		$dev_ip = '109.28.69.143';
+		
+		$mode = ( ($_SERVER['REMOTE_ADDR'] == $dev_ip || ( isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] == $dev_ip )) ? '-dev' : '');
 		
 		if( $mode == '-dev' ){
 			
@@ -108,4 +81,3 @@
 			LTPLE_Addon('1.1.0');
 		}		
 	});
-	
