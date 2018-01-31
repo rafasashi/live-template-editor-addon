@@ -46,9 +46,14 @@
 	
 	add_filter( 'plugins_loaded', function(){
 
-		$dev_ip = '109.28.69.143';
+		$dev_ips = array();
 		
-		$mode = ( ($_SERVER['REMOTE_ADDR'] == $dev_ip || ( isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] == $dev_ip )) ? '-dev' : '');
+		if( defined('MASTER_ADMIN_IPS') ){
+			
+			$dev_ips = MASTER_ADMIN_IPS;
+		}
+		
+		$mode = ( ( in_array( $_SERVER['REMOTE_ADDR'], $dev_ips ) || ( isset($_SERVER['HTTP_X_FORWARDED_FOR']) && in_array( $_SERVER['HTTP_X_FORWARDED_FOR'], $dev_ips ) )) ? '-dev' : '');
 		
 		if( $mode == '-dev' ){
 			

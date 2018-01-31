@@ -71,7 +71,8 @@ class LTPLE_Addon_Settings {
 	public function settings_fields () {
 		
 		$settings = [];
-
+		
+		/*
 		$settings['test'] = array(
 			'title'					=> __( 'Test', $this->plugin->slug ),
 			'description'			=> '',
@@ -87,6 +88,7 @@ class LTPLE_Addon_Settings {
 				),				
 			)
 		);
+		*/
 		
 		if( !empty($settings) ){
 		
@@ -113,7 +115,7 @@ class LTPLE_Addon_Settings {
 	public function add_menu_items () {
 		
 		//add menu in wordpress dashboard
-
+		/*
 		add_submenu_page(
 			'live-template-editor-client',
 			__( 'Addon test', $this->plugin->slug ),
@@ -121,5 +123,6 @@ class LTPLE_Addon_Settings {
 			'edit_pages',
 			'edit.php?post_type=post'
 		);
+		*/
 	}
 }
