@@ -43,22 +43,32 @@ class LTPLE_Addon_Settings {
 		$this->plugin 		 	= new stdClass();
 		$this->plugin->slug  	= 'live-template-editor-addon';
 		
-		add_action('ltple_plugin_settings', array($this, 'plugin_info' ) );
+		// add plugin to addons
+		
+		add_action('ltple_admin_addons', array($this, 'plugin_info' ) );
+		
+		// add settings
 		
 		add_action('ltple_plugin_settings', array($this, 'settings_fields' ) );
 		
-		add_action( 'ltple_admin_menu' , array( $this, 'add_menu_items' ) );	
+		// add menu
+		
+		add_action( 'ltple_admin_menu' , array( $this, 'add_menu_items' ) );
+
+		// add tabs
+		
+		add_filter( 'ltple_admin_tabs', array( $this, 'add_tabs'), 1 );		
 	}
 	
 	public function plugin_info(){
 		
-		$this->parent->settings->addons['addon-plugin'] = array(
+		$this->parent->settings->addons['live-template-editor-addon'] = array(
 			
-			'title' 		=> 'Addon Plugin',
+			'title' 		=> 'Live Template Editor Addon',
 			'addon_link' 	=> 'https://github.com/rafasashi/live-template-editor-addon',
 			'addon_name' 	=> 'live-template-editor-addon',
 			'source_url' 	=> 'https://github.com/rafasashi/live-template-editor-addon/archive/master.zip',
-			'description'	=> 'This is a first test of addon plugin for live template editor.',
+			'description'	=> '[PLUGIN_DESCRIPTION]',
 			'author' 		=> 'Rafasashi',
 			'author_link' 	=> 'https://profiles.wordpress.org/rafasashi/',
 		);		
@@ -71,6 +81,20 @@ class LTPLE_Addon_Settings {
 	public function settings_fields () {
 		
 		$settings = [];
+		
+		// add url to urls tab
+		/*
+		$settings['urls']['fields'][] = array(
+		
+			'id' 			=> 'addonSlug',
+			'label'			=> __( 'Addon Page' , $this->plugin->slug ),
+			'description'	=> '[ltple-client-addon-page]',
+			'type'			=> 'slug',
+			'placeholder'	=> __( 'addons', $this->plugin->slug )
+		);
+		*/
+		
+		// add new setting tab
 		
 		/*
 		$settings['test'] = array(
@@ -124,5 +148,24 @@ class LTPLE_Addon_Settings {
 			'edit.php?post_type=post'
 		);
 		*/
+	}
+	
+	public function add_tabs() {
+		
+		// add in default contents
+		
+		//$this->parent->settings->tabs['default-contents']['addon-post-type-here'] = array( 'name' => 'Tab name here');
+		
+		// add in user contents
+		
+		//$this->parent->settings->tabs['user-contents']['addon-post-type-here'] = array( 'name' => 'Tab name here');
+		
+		// add in gallery settings
+		
+		//$this->parent->settings->tabs['gallery-settings']['addon-post-type-here'] = array( 'name' => 'Tab name here');
+		
+		// add in services apps
+		
+		//$this->parent->settings->tabs['services-apps']['addon-post-type-here'] = array( 'name' => 'Tab name here');
 	}
 }
