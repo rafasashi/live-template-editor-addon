@@ -88,7 +88,7 @@ class LTPLE_Addon_Settings {
 		
 			'id' 			=> 'addonSlug',
 			'label'			=> __( 'Addon Page' , $this->plugin->slug ),
-			'description'	=> '[ltple-client-addon-page]',
+			'description'	=> '[ltple-client-addon]',
 			'type'			=> 'slug',
 			'placeholder'	=> __( 'addons', $this->plugin->slug )
 		);

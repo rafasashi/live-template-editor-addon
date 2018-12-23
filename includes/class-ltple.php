@@ -48,9 +48,9 @@ class LTPLE_Addon {
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), 10, 1 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_styles' ), 10, 1 );
 		
-		$this->settings = new LTPLE_Settings( $this->parent );
+		$this->settings = new LTPLE_Addon_Settings( $this->parent );
 		
-		$this->admin = new LTPLE_Admin_API( $this );
+		$this->admin = new LTPLE_Addon_Admin_API( $this );
 
 		if ( !is_admin() ) {
 
@@ -179,9 +179,16 @@ class LTPLE_Addon {
 		
 		if($this->parent->user->loggedin){
 			
-			include($this->parent->views . '/navbar.php');
+			if( !empty($_REQUEST['output']) && $_REQUEST['output'] == 'widget' ){
+				
+				include($this->views . '/widget.php');
+			}
+			else{
 			
-			include($this->views . '/panel.php');
+				include($this->parent->views . '/navbar.php');
+			
+				include($this->views . '/panel.php');
+			}
 		}
 		else{
 			
@@ -223,7 +230,7 @@ class LTPLE_Addon {
 			$slug = update_option( $this->parent->_base . 'addonSlug', get_post($post_id)->post_name );
 		}
 		
-		$this->parent->urls->addon = $this->parent->home . '/' . $slug . '/';	
+		$this->parent->urls->addon = $this->parent->urls->home . '/' . $slug . '/';	
 		
 		*/
 	}
