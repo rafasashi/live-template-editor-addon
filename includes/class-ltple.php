@@ -18,6 +18,10 @@ class LTPLE_Addon {
 	 * @since   1.0.0
 	 * @return  void
 	 */
+	 
+	var $slug;
+	var $tab;
+	 
 	public function __construct ( $file='', $parent, $version = '1.0.0' ) {
 
 		$this->parent = $parent;
@@ -77,23 +81,50 @@ class LTPLE_Addon {
 		// add user attributes
 		
 		add_filter( 'ltple_user_loaded', array( $this, 'add_user_attribute'));			
+
+		// hangle user logs
 		
-		// add panel shortocode
+		add_filter( 'ltple_first_log_ever', array( $this, 'handle_first_log_ever'));			
 		
-		add_shortcode('ltple-client-addon', array( $this , 'get_panel_shortcode' ) );
+		add_filter( 'ltple_first_log_today', array( $this, 'handle_first_log_today'));
+				
+		// add query vars
+		
+		add_filter('query_vars', array( $this , 'add_query_vars' ), 1);	
 	
 		// add panel url
 		
 		add_filter( 'ltple_urls', array( $this, 'get_panel_url'));
 		
-		// add subscription features
+		// add url parameters
 		
-		add_filter( 'ltple_plan_subscribed', array( $this, 'handle_subscription_plan'));
+		add_filter( 'template_redirect', array( $this, 'get_url_parameters'));		
+		
+		// add privacy settings
+				
+		add_filter('ltple_privacy_settings',array($this,'set_privacy_fields'));		
+		
+		// add panel shortocode
+		
+		add_shortcode('ltple-client-addon', array( $this , 'get_panel_shortcode' ) );
+			
+		// add notification settings
+		
+		add_filter( 'ltple_notification_settings', array( $this, 'get_notification_settings'));		
 		
 		// add link to theme menu
 		
 		add_filter( 'ltple_view_my_profile', array( $this, 'add_theme_menu_link'));	
 				
+		// add button to navbar
+				
+		add_filter( 'ltple_left_navbar', array( $this, 'add_left_navbar_button'));	
+		add_filter( 'ltple_right_navbar', array( $this, 'add_right_navbar_button'));	
+						
+		// add profile tabs		
+
+		add_filter( 'ltple_profile_tabs', array( $this, 'add_profile_tabs'));
+		
 		// add layer fields
 		
 		add_filter( 'ltple_layer_options', array( $this, 'add_layer_options'),10,1);
@@ -158,6 +189,20 @@ class LTPLE_Addon {
 	
 	}
 	
+	public function set_privacy_fields(){
+		 
+		/*
+		$this->parent->profile->privacySettings['addon-policy'] = array(
+
+			'id' 			=> $this->parent->_base . 'policy_' . 'addon-policy',
+			'label'			=> 'Addon policy',
+			'description'	=> 'Addon provacy policy',
+			'type'			=> 'switch',
+			'default'		=> 'on',
+		);
+		*/
+	}
+	
 	public function header(){
 		
 		//echo '<link rel="stylesheet" href="https://raw.githubusercontent.com/dbtek/bootstrap-vertical-tabs/master/bootstrap.vertical-tabs.css">';	
@@ -173,6 +218,16 @@ class LTPLE_Addon {
 		// add user attribute
 			
 		//$this->parent->user->userAttribute = new LTPLE_Addon_User( $this->parent );	
+	}
+	
+	public function handle_first_log_ever(){
+		
+
+	}
+	
+	public function handle_first_log_today(){
+		
+
 	}
 	
 	public function get_panel_shortcode(){
@@ -208,6 +263,16 @@ class LTPLE_Addon {
 		}				
 	}
 	
+	public function add_query_vars( $query_vars ){
+		
+		if(!in_array('tab',$query_vars)){
+		
+			$query_vars[] = 'tab';
+		}
+		
+		return $query_vars;	
+	}
+	
 	public function get_panel_url(){
 		
 		/*
@@ -233,6 +298,47 @@ class LTPLE_Addon {
 		$this->parent->urls->addon = $this->parent->urls->home . '/' . $slug . '/';	
 		
 		*/
+		
+		// add rewrite rules
+		
+		/*
+		
+		add_rewrite_rule(
+		
+			$this->slug . '/([^/]+)/?$',
+			'index.php?pagename=' . $this->slug . '&tab=$matches[1]',
+			'top'
+		);
+		
+		add_rewrite_rule(
+		
+			$this->slug . '/([^/]+)/([0-9]+)/?$',
+			'index.php?pagename=' . $this->slug . '&tab=$matches[1]&aid=$matches[2]',
+			'top'
+		);
+		
+		*/
+	}
+
+	public function get_url_parameters(){
+
+		// get tab name
+
+		if( !$this->tab = get_query_var('tab') ){
+			
+			$this->tab = 'addon-tab';
+		}
+	}
+	
+	public function get_notification_settings(){
+		
+		/*
+		$this->parent->email->notification_settings['addon-channel'] = array(
+			
+			'default' 		=> 'true',
+			'description' 	=> '',
+		);
+		*/
 	}
 	
 	public function add_theme_menu_link(){
@@ -246,6 +352,23 @@ class LTPLE_Addon {
 
 		echo'</li>';
 		*/
+	}
+	
+	public function add_left_navbar_button(){
+	
+	}
+	
+	public function add_right_navbar_button(){
+		
+		
+		
+	}
+	
+	public function add_profile_tabs(){
+		
+		//$this->parent->profile->tabs['addon']['position'] = 3;
+		//$this->parent->profile->tabs['addon']['name'] = 'Addon Tab';
+		//$this->parent->profile->tabs['addon']['content'] = 'Addon content';		
 	}
 	
 	public function add_layer_options($term_slug){

@@ -11,7 +11,7 @@
 	
 	$tabs = ['tab1','tab2'];
 	
-	$currentTab = ( !empty($_GET['tab']) && in_array($_GET['tab'],$tabs) ? $_GET['tab'] : 'default' );
+	$currentTab = ( !empty($this->tab) && in_array($this->tab,$tabs) ? $this->tab : 'addon-tab' );
 	
 	// ------------- output panel --------------------
 	
@@ -23,9 +23,9 @@
 				
 				echo'<li class="gallery_type_title">Addon Sidebar</li>';
 				
-				echo'<li'.( $currentTab == 'tab1' ? ' class="active"' : '' ).'><a href="'.$this->parent->urls->domains . '">Tab1 <span class="label label-success pull-right"> pro </span></a></li>';
+				echo'<li'.( $currentTab == 'tab1' ? ' class="active"' : '' ).'><a href="'.$this->parent->urls->addon . '">Tab1 <span class="label label-success pull-right"> pro </span></a></li>';
 
-				echo'<li'.( $currentTab == 'tab2' ? ' class="active"' : '' ).'><a href="'.$this->parent->urls->domains . '?tab=urls">Tab2 <span class="label label-success pull-right"> pro </span></a></li>';
+				echo'<li'.( $currentTab == 'tab2' ? ' class="active"' : '' ).'><a href="'.$this->parent->urls->addon . '?tab=urls">Tab2 <span class="label label-success pull-right"> pro </span></a></li>';
 				
 			echo'</ul>';
 			
