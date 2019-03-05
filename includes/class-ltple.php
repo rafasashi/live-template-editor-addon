@@ -127,6 +127,8 @@ class LTPLE_Addon {
 		
 		// add layer fields
 		
+		add_filter( 'ltple_default_layer_fields', array( $this, 'add_default_layer_fields'),10);
+				
 		add_filter( 'ltple_layer_options', array( $this, 'add_layer_options'),10,1);
 		add_filter( 'ltple_layer_plan_fields', array( $this, 'add_layer_plan_fields'),10,2);
 		add_action( 'ltple_save_layer_fields', array( $this, 'save_layer_fields' ),10,1);			
@@ -149,6 +151,8 @@ class LTPLE_Addon {
 		
 		add_filter( 'ltple_user_plan_option_total', array( $this, 'add_user_plan_option_total'),10,2);
 		add_filter( 'ltple_user_plan_info', array( $this, 'add_user_plan_info'),10,1);
+		
+		$this->add_star_triggers();
 		
 		// addon post types
 		
@@ -176,6 +180,26 @@ class LTPLE_Addon {
 		));
 		
 		*/
+		
+		/*
+		
+		add_action('add_meta_boxes', function(){
+
+			global $post;
+			
+			if( $post->post_type == 'cb-default-layer' ){
+				
+				$this->admin->add_meta_box (
+					
+					'layer-addon-field',
+					__( 'Template Addon Field', 'live-template-editor-addon' ), 
+					array($post->post_type),
+					'side'
+				);					
+			}
+		});
+
+		*/		
 	
 	} // End __construct ()
 	
@@ -323,11 +347,13 @@ class LTPLE_Addon {
 	public function get_url_parameters(){
 
 		// get tab name
-
+		
+		/*
 		if( !$this->tab = get_query_var('tab') ){
 			
 			$this->tab = 'addon-tab';
 		}
+		*/
 	}
 	
 	public function get_notification_settings(){
@@ -370,6 +396,24 @@ class LTPLE_Addon {
 		//$this->parent->profile->tabs['addon']['name'] = 'Addon Tab';
 		//$this->parent->profile->tabs['addon']['content'] = 'Addon content';		
 	}
+	
+	public function add_default_layer_fields(){
+		
+		/*
+		$this->parent->layer->defaultFields[]=array(
+		
+			"metabox" =>
+			
+				array('name'=>"layer-addon-field"),
+				'id'			=> "layerAddonField",
+				'label'			=> "",
+				'type'			=> 'number',
+				'default'		=> '0',
+				'placeholder'	=> '0',
+				'description'	=> ''
+		);
+		*/		
+	}	
 	
 	public function add_layer_options($term_slug){
 		
@@ -583,6 +627,18 @@ class LTPLE_Addon {
 	public function handle_subscription_plan(){
 				
 		
+	}
+	
+	public function add_star_triggers(){
+		
+		/*
+		$this->parent->stars->triggers['addon interaction']['ltple_addon_action'] = array(
+				
+			'description' => 'when you do an addon action'
+		);
+		*/		
+
+		return true;
 	}
 	
 	public function add_user_plan_option_total( $user_id, $options ){
