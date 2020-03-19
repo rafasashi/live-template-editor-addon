@@ -31,6 +31,8 @@ class LTPLE_Addon {
 		
 		$this->message = '';
 		
+		$this->slug = 'addon';
+		
 		// Load plugin environment variables
 		$this->file 		= $file;
 		$this->dir 			= dirname( $this->file );
@@ -123,7 +125,7 @@ class LTPLE_Addon {
 						
 		// add profile tabs		
 
-		add_filter( 'ltple_profile_tabs', array( $this, 'add_profile_tabs'));
+		add_filter( 'ltple_profile_tabs', array( $this, 'add_profile_tabs'),10,1);
 		
 		// add layer fields
 		
@@ -151,6 +153,8 @@ class LTPLE_Addon {
 		
 		add_filter( 'ltple_user_plan_option_total', array( $this, 'add_user_plan_option_total'),10,2);
 		add_filter( 'ltple_user_plan_info', array( $this, 'add_user_plan_info'),10,1);
+		
+		add_filter( 'ltple_dashboard_sidebar', array( $this, 'get_sidebar_content' ),2,3);	
 		
 		$this->add_star_triggers();
 		
@@ -256,34 +260,25 @@ class LTPLE_Addon {
 	
 	public function get_panel_shortcode(){
 		
-		if($this->parent->user->loggedin){
+		if( !empty($_REQUEST['output']) && $_REQUEST['output'] == 'widget' ){
 			
-			if( !empty($_REQUEST['output']) && $_REQUEST['output'] == 'widget' ){
-				
+			if($this->parent->user->loggedin){
+			
 				include($this->views . '/widget.php');
-			}
-			else{
-			
-				include($this->parent->views . '/navbar.php');
-			
-				include($this->views . '/panel.php');
 			}
 		}
 		else{
+		
+			include($this->parent->views . '/navbar.php');
 			
-			echo'<div style="font-size:20px;padding:20px;margin:0;" class="alert alert-warning">';
+			if($this->parent->user->loggedin){
+			
+				include($this->views . '/panel.php');
+			}
+			else{
 				
-				echo'You need to log in first...';
-				
-				echo'<div class="pull-right">';
-
-					echo'<a style="margin:0 2px;" class="btn-lg btn-success" href="'. wp_login_url( $this->parent->request->proto . $_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'] ) .'">Login</a>';
-					
-					echo'<a style="margin:0 2px;" class="btn-lg btn-info" href="'. wp_login_url( $this->parent->urls->editor ) .'&action=register">Register</a>';
-				
-				echo'</div>';
-				
-			echo'</div>';
+				echo $this->parent->login->get_form();
+			}
 		}				
 	}
 	
@@ -367,6 +362,36 @@ class LTPLE_Addon {
 		*/
 	}
 	
+	public function get_sidebar_content($sidebar,$currentTab,$output){
+		
+		/*
+		
+		$storage_count = $this->parent->layer->count_layers_by('storage');
+		
+		$content = '';
+		
+		if( !empty($storage_count['tab1']) ){
+
+			$content .= '<li'.( $currentTab == 'tab1' ? ' class="active"' : '' ).'><a href="'.$this->parent->urls->gallery . '?list=tab1">Tab1</a></li>';
+		}
+		
+		if( !empty($storage_count['tab2']) ){
+		
+			$content .= '<li'.( $currentTab == 'tab2' ? ' class="active"' : '' ).'><a href="'.$this->parent->urls->gallery . '?list=tab2">Tab2</a></li>';
+		}
+			
+		if( !empty($content) ){
+		
+			$sidebar .= '<li class="gallery_type_title">Addon action</li>';
+		
+			$sidebar .= $content;
+		}
+		
+		*/
+		
+		return $sidebar;
+	}
+	
 	public function add_theme_menu_link(){
 
 		// add theme menu link
@@ -390,11 +415,37 @@ class LTPLE_Addon {
 		
 	}
 	
-	public function add_profile_tabs(){
+	public function add_profile_tabs($tabs){
 		
-		//$this->parent->profile->tabs['addon']['position'] = 3;
-		//$this->parent->profile->tabs['addon']['name'] = 'Addon Tab';
-		//$this->parent->profile->tabs['addon']['content'] = 'Addon content';		
+		/*
+		
+		$tabs[$this->slug]['position'] 	= 3;
+		$tabs[$this->slug]['name'] 		= 'Addon Tab';
+		
+		if( $this->parent->profile->tab == $this->slug ){
+			
+			add_action( 'wp_enqueue_scripts',function(){
+
+				wp_register_style( $this->parent->_token . $this->slug, false, array());
+				wp_enqueue_style( $this->parent->_token . $this->slug );
+			
+				wp_add_inline_style( $this->parent->_token . $this->slug, '
+
+					#' . $this->slug . ' {
+						
+						margin-top:15px;
+					}
+					
+				');
+
+			},10 );	
+
+			$tabs[$this->slug]['content'] = 'Addon content';	
+		}
+			
+		*/
+		
+		return $tabs;
 	}
 	
 	public function add_default_layer_fields(){
@@ -415,43 +466,12 @@ class LTPLE_Addon {
 		*/		
 	}	
 	
-	public function add_layer_options($term_slug){
+	public function add_layer_options($term_id){
 		
-		/*
-		
-		if(!$addon_amount = get_option('addon_amount_' . $term_slug)){
-			
-			$addon_amount = 0;
-		}
-
-		$this->parent->layer->options = array(
-			
-			'addon_amount' 	=> $addon_amount,
-		);
-		*/
 	}
 	
-	public function add_layer_plan_fields( $taxonomy, $term_slug = '' ){
-		
-		/*
-		
-		$data = [];
+	public function add_layer_plan_fields( $taxonomy, $term_id ){
 
-		if( !empty($term_slug) ){
-		
-			$data['addon_amount'] = get_option('addon_amount_' . $term_slug); 
-			$data['addon_period'] = get_option('addon_period_' . $term_slug); 
-		}
-
-		echo'<div class="form-field" style="margin-bottom:15px;">';
-			
-			echo'<label for="'.$taxonomy.'-addon-amount">Addon plan attribute</label>';
-
-			echo $this->get_layer_addon_fields($taxonomy,$data);
-			
-		echo'</div>';
-		
-		*/
 	}
 	
 	public function get_layer_addon_fields( $taxonomy_name, $args = [] ){
