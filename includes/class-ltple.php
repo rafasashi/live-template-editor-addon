@@ -78,7 +78,7 @@ class LTPLE_Addon {
 
 		// Custom template path
 		
-		add_filter( 'template_include', array( $this, 'template_path'), 1 );
+		add_filter( 'ltple_layer_template', array( $this, 'filter_template_path'),1,2);
 		
 		// add user attributes
 		
@@ -183,6 +183,11 @@ class LTPLE_Addon {
 			'menu_icon' 			=> 'dashicons-admin-post',
 		));
 		
+		add_filter('ltple_addon-post-type_layer_area',function(){ 
+			
+			return 'frontend';
+		});
+		
 		*/
 		
 		/*
@@ -207,10 +212,10 @@ class LTPLE_Addon {
 	
 	} // End __construct ()
 	
-	public function template_path( $template_path ){
+	public function filter_template_path( $path, $layer ){
 		
 		
-		return $template_path;
+		return $path;
 	}
 	
 	public function init(){	 
