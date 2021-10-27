@@ -34,8 +34,7 @@ class LTPLE_Addon_Settings {
 	 * @access  public
 	 * @since   1.0.0
 	 */
-	public $settings = array();
-
+	 
 	public function __construct ( $parent ) {
 		
 		$this->parent = $parent;
@@ -49,7 +48,7 @@ class LTPLE_Addon_Settings {
 		
 		// add settings
 		
-		add_action('ltple_plugin_settings', array($this, 'settings_fields' ) );
+		add_action('ltple_settings_fields', array($this, 'settings_fields' ) );
 		
 		// add menu
 		
@@ -78,10 +77,8 @@ class LTPLE_Addon_Settings {
 	 * Build settings fields
 	 * @return array Fields to be displayed on settings page
 	 */
-	public function settings_fields () {
-		
-		$settings = [];
-		
+	public function settings_fields ($settings) {
+
 		// add url to urls tab
 		/*
 		$settings['urls']['fields'][] = array(
@@ -114,22 +111,7 @@ class LTPLE_Addon_Settings {
 		);
 		*/
 		
-		if( !empty($settings) ){
-		
-			foreach( $settings as $slug => $data ){
-				
-				if( isset($this->parent->settings->settings[$slug]['fields']) && !empty($data['fields']) ){
-					
-					$fields = $this->parent->settings->settings[$slug]['fields'];
-					
-					$this->parent->settings->settings[$slug]['fields'] = array_merge($fields,$data['fields']);
-				}
-				else{
-					
-					$this->parent->settings->settings[$slug] = $data;
-				}
-			}
-		}
+		return $settings;
 	}
 	
 	/**
