@@ -110,10 +110,6 @@ class LTPLE_Addon {
 		
 		add_shortcode('ltple-client-addon', array( $this , 'get_panel_shortcode' ) );
 			
-		// add notification settings
-		
-		add_filter( 'ltple_notification_settings', array( $this, 'get_notification_settings'));		
-		
 		// add link to theme menu
 		
 		add_filter( 'ltple_view_my_profile', array( $this, 'add_theme_menu_link'));	
@@ -353,17 +349,6 @@ class LTPLE_Addon {
 			
 			$this->tab = 'addon-tab';
 		}
-		*/
-	}
-	
-	public function get_notification_settings(){
-		
-		/*
-		$this->parent->email->notification_settings['addon-channel'] = array(
-			
-			'default' 		=> 'true',
-			'description' 	=> '',
-		);
 		*/
 	}
 	

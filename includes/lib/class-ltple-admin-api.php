@@ -510,7 +510,7 @@ class LTPLE_Addon_Admin_API {
 				
 				update_post_meta( $post_id, $field['id'], $this->validate_field( $_REQUEST[ $field['id'] ], $field['type'] ) );
 			} 
-			else {
+			elseif( empty($field['disabled']) ){
 				
 				update_post_meta( $post_id, $field['id'], '' );
 			}
